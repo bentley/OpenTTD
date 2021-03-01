@@ -46,14 +46,21 @@ install(FILES
 if(OPTION_INSTALL_FHS)
     set(MAN_SOURCE_FILE ${CMAKE_SOURCE_DIR}/docs/openttd.6)
     set(MAN_BINARY_FILE ${CMAKE_BINARY_DIR}/docs/${BINARY_NAME}.6)
+    if(OPTION_COMPRESS_MANPAGE)
+        set(MAN_INSTALL_FILE ${MAN_BINARY_FILE}.gz)
+    else()
+        set(MAN_INSTALL_FILE ${MAN_BINARY_FILE})
+    endif()
     install(CODE
             "
                 execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${MAN_SOURCE_FILE} ${MAN_BINARY_FILE})
-                execute_process(COMMAND gzip -9 -n -f ${MAN_BINARY_FILE})
+                if(OPTION_COMPRESS_MANPAGE)
+                    execute_process(COMMAND gzip -9 -n -f ${MAN_BINARY_FILE})
+                endif()
             "
             COMPONENT manual)
     install(FILES
-                    ${MAN_BINARY_FILE}.gz
+                    ${MAN_INSTALL_FILE}
             DESTINATION ${MAN_DESTINATION_DIR}/man6
             COMPONENT manual)
 endif()
